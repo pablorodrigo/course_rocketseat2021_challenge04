@@ -7,6 +7,7 @@
 import request from "supertest";
 import {Connection, createConnection} from "typeorm";
 import {app} from "../../../../app";
+import {OperationType} from "../../entities/Statement";
 
 
 let connection: Connection;
@@ -41,7 +42,7 @@ describe("Deposit Statements", () => {
       .send({ amount: 100, description: "deposit" })
       .set({ Authorization: `Bearer ${token}` });
 
-    const { amount } = response.body;
+    const { amount, description } = response.body;
 
     const responseBalance = await request(app)
       .get("/api/v1/statements/balance")
@@ -51,6 +52,8 @@ describe("Deposit Statements", () => {
 
     expect(response.status).toBe(201);
     expect(amount).toEqual(100);
+    expect(description).toEqual(OperationType.DEPOSIT as string);
     expect(amount).toEqual(balance);
+
   });
 });

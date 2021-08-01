@@ -21,6 +21,7 @@ interface IRequest {
 enum OperationType {
   DEPOSIT = "deposit",
   WITHDRAW = "withdraw",
+  TRANSFER = "transfer",
 }
 
 let getBalanceUseCase: GetBalanceUseCase;
@@ -100,7 +101,7 @@ describe("Create Statements", () => {
     expect(balance.balance).toEqual(0);
   });
 
-  /*it("should be able to create a new transfer", async () => {
+  it("should be able to create a new transfer", async () => {
     const userSenderDTO: ICreateUserDTO = {
       name: "sender",
       email: "sender@test.com",
@@ -142,8 +143,8 @@ describe("Create Statements", () => {
     expect(statementDeposit.amount).toEqual(100);
     expect(statementTransfer.amount).toEqual(50);
     expect(balanceSender.balance).toEqual(50);
-    expect(balanceReceiver.balance).toEqual(statementTransfer.amount);
-  });*/
+    expect(balanceReceiver.balance).toEqual(50);
+  });
 
   it("should not be able to create a withdraw > balance", async () => {
     await expect(async () => {

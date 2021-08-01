@@ -50,6 +50,9 @@ describe("Get Statements Balance", () => {
       .get("/api/v1/statements/balance")
       .set({ Authorization: `Bearer ${token}` });
 
+    const {balance} = response.body
+
     expect(response.status).toBe(200);
+    expect(balance).toBe(50);
   });
 });

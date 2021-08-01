@@ -1,4 +1,4 @@
-import { Statement } from "../../entities/Statement";
+import {OperationType, Statement} from "../../entities/Statement";
 import { ICreateStatementDTO } from "../../useCases/createStatement/ICreateStatementDTO";
 import { IGetBalanceDTO } from "../../useCases/getBalance/IGetBalanceDTO";
 import { IGetStatementOperationDTO } from "../../useCases/getStatementOperation/IGetStatementOperationDTO";
@@ -7,10 +7,28 @@ import { IStatementsRepository } from "../IStatementsRepository";
 export class InMemoryStatementsRepository implements IStatementsRepository {
   private statements: Statement[] = [];
 
-  async create(data: ICreateStatementDTO): Promise<Statement> {
+  async create({
+                 user_id,
+                 receiver_id,
+                 amount,
+                 description,
+                 type,
+               }: ICreateStatementDTO): Promise<Statement> {
     const statement = new Statement();
 
-    Object.assign(statement, data);
+    Object.assign(statement, {
+      user_id,
+      amount,
+      description,
+      type,
+    });
+
+    if (statement.type === OperationType.TRANSFER) {
+      Object.assign(statement, {
+        sender_id: user_id,
+        receiver_id,
+      });
+    }
 
     this.statements.push(statement);
 
@@ -29,10 +47,11 @@ export class InMemoryStatementsRepository implements IStatementsRepository {
       { balance: number } | { balance: number, statement: Statement[] }
     >
   {
-    const statement = this.statements.filter(operation => operation.user_id === user_id);
+
+    const statement = this.statements.filter(operation => operation.user_id === user_id || operation.receiver_id === user_id);
 
     const balance = statement.reduce((acc, operation) => {
-      if (operation.type === 'deposit') {
+      if (operation.type === 'deposit' || user_id === operation.receiver_id) {
         return acc + operation.amount;
       } else {
         return acc - operation.amount;
